@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proxy Launcher</title>
+    <style>
+        :root {
+            --primary: #4a00e0;
+            --secondary: #8e2de2;
+            --accent: #00d4ff;
+            --background: #f5f7fa;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+            --text-light: #636e72;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px var(--shadow);
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        #proxy-search {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid var(--accent);
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        #proxy-search:focus {
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            padding: 0 20px;
+        }
+
+        .tab-button {
+            padding: 12px 25px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover::before {
+            left: 0;
+        }
+
+        .tab-button.active {
+            background: var(--accent);
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 1em;
+            color: white;
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button::after {
+            content: '→';
+            position: absolute;
+            right: 15px;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        button:hover::after {
+            opacity: 1;
+            right: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .button-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .tab-button {
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Proxy Launcher</h1>
+        <div class="search-container">
+            <input type="text" id="proxy-search" placeholder="Search proxies...">
+        </div>
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab('interstellar')">Interstellar</button>
+            <button class="tab-button" onclick="openTab('rammerhead')">Rammerhead</button>
+            <button class="tab-button" onclick="openTab('utopia')">Utopia</button>
+            <button class="tab-button" onclick="openTab('space')">Space</button>
+            <button class="tab-button" onclick="openTab('doge')">Doge</button>
+            <button class="tab-button" onclick="openTab('incognito')">Incognito</button>
+            <button class="tab-button" onclick="openTab('shadow')">Shadow</button>
+            <button class="tab-button" onclick="openTab('shuttle')">Shuttle</button>
+        </div>
+
+        <!-- Interstellar Proxies -->
+        <div id="interstellar" class="tab-content active">
+            <div class="button-grid">
+                <button onclick="openLink('https://prestonfootnite33.suarakeadilan.org/')">Proxy 1</button>
+                <button onclick="openLink('https://kleep.paulopedron.com/')">Proxy 2</button>
+                <button onclick="openLink('https://kleep.epicgamer.org/')">Proxy 3</button>
+                <button onclick="openLink('https://newhomeowners.org.myhousesetup.com/')">Proxy 4</button>
+                <button onclick="openLink('https://imisstheoldkanye.chillcrew.net/')">Proxy 5</button>
+                <button onclick="openLink('https://justbuiltdifferent.chillcrew.net/')">Proxy 6</button>
+                <button onclick="openLink('https://super.puddlehunters.net/')">Proxy 7</button>
+                <button onclick="openLink('https://imagoofygooberrock.vercel.app/')">Proxy 8</button>
+                <button onclick="openLink('https://about.aitic.us/')">Proxy 9</button>
+                <button onclick="openLink('http://hardmanth.justlearning.net/')">Proxy 10</button>
+                <button onclick="openLink('https://poa1itm.s-mold.net/')">Proxy 11</button>
+                <button onclick="openLink('https://owner.should.hopefully.spot.this.ingeker.cl/')">Proxy 12</button>
+                <button onclick="openLink('https://fsdfsdsdf.mooo.info/')">Proxy 13</button>
+                <button onclick="openLink('https://4287613382.uncork.biz/')">Proxy 14</button>
+                <button onclick="openLink('https://concitedll.conifera.cl/')">Proxy 15</button>
+                <button onclick="openLink('https://helpmeget.root.sx/')">Proxy 16</button>
+                <button onclick="openLink('https://mrrychrimisg7xv2mlqzp9sd4khjf.autoluc.cl/')">Proxy 17</button>
+                <button onclick="openLink('https://prestonhitgrandmasterinyorkmate.tice-industries.com/')">Proxy 18</button>
+                <button onclick="openLink('https://taffy.fromhell.lv/')">Proxy 19</button>
+                <button onclick="openLink('https://jt.teamoptimization.com/')">Proxy 20</button>
+                <button onclick="openLink('https://learn.study-maths.tuplantaforma.com/')">Proxy 21</button>
+                <button onclick="openLink('https://edu.bizis.si/')">Proxy 22</button>
+                <button onclick="openLink('https://study.republik.ec/')">Proxy 23</button>
+                <button onclick="openLink('https://interstellar.midnite.space/')">Proxy 24</button>
+                <button onclick="openLink('https://interstellar-git-main-surges-projects-3eb46597.vercel.app/')">Proxy 25</button>
+                <button onclick="openLink('https://distance-rate-time-word-problems.ghostnation.org/')">Proxy 26</button>
+                <button onclick="openLink('https://superhardalgebraproblems.mjt-gifts.com/')">Proxy 27</button>
+                <button onclick="openLink('https://xyz.zaylovesparker.xyz/')">Proxy 28</button>
+                <button onclick="openLink('https://worldwaronehistory.lozan.com/')">Proxy 29</button>
+                <button onclick="openLink('https://bookworm.manolovici.ro/')">Proxy 30</button>
+                <button onclick="openLink('https://algebra.learn-math.study.thebrittainlawfirm.com/')">Proxy 31</button>
+                <button onclick="openLink('https://edwardai.celtametal.cl/')">Proxy 32</button>
+                <button onclick="openLink('https://krishypoo.adolar.ch/')">Proxy 33</button>
+                <button onclick="openLink('https://cactusjack.litos.co.uk/')">Proxy 34</button>
+                <button onclick="openLink('http://daggers-are-good.spfv.ro/')">Proxy 35</button>
+                <button onclick="openLink('https://brockwiresvslinewize.yiff.fi/')">Proxy 36</button>
+                <button onclick="openLink('https://herricksdiddleschool.homelinuxserver.org/')">Proxy 37</button>
+                <button onclick="openLink('https://ixl-tw6f.thebrittainlawfirm.com/')">Proxy 38</button>
+                <button onclick="openLink('https://inter.yiff.fi/')">Proxy 39</button>
+                <button onclick="openLink('https://edwardsflorr.celtametal.cl/')">Proxy 40</button>
+                <button onclick="openLink('https://veryhotmoms.qlbv.vn/')">Proxy 41</button>
+                <button onclick="openLink('https://supacool.pro.acquyvienthongcu.com/')">Proxy 42</button>
+                <button onclick="openLink('https://applet.redragon.net/')">Proxy 43</button>
+                <button onclick="openLink('https://sigma-tyrone-approved.silksky.com/')">Proxy 44</button>
+                <button onclick="openLink('https://english-ll-learning.pagostepeapulco.gob.mx/')">Proxy 45</button>
+                <button onclick="openLink('https://goatmika.thehomeserver.net/')">Proxy 46</button>
+                <button onclick="openLink('http://mikalol.r-o-o-t.net/')">Proxy 47</button>
+                <button onclick="openLink('https://youreagoodmanarthurmorgan.ignorelist.com/')">Proxy 48</button>
+                <button onclick="openLink('http://i.live.in.your.bahtroom.v2.cz.rs.sigma.soon.it/')">Proxy 49</button>
+                <button onclick="openLink('https://studyguidehistory.qlbv.vn/')">Proxy 50</button>
+                <button onclick="openLink('http://studyguidehistory.twilightparadox.com/')">Proxy 51</button>
+                <button onclick="openLink('https://chat-isinterstellargood.safira.com.my/')">Proxy 52</button>
+                <button onclick="openLink('https://cloudbarfbagisback.saugatnepal.com.np/')">Proxy 53</button>
+                <button onclick="openLink('https://andrewstopadminabusing.raspberryip.com/')">Proxy 54</button>
+                <button onclick="openLink('https://theunitedstatesofcanada.raspberryip.com/')">Proxy 55</button>
+                <button onclick="openLink('https://julius.caeser.is.my-homie.burgermap.org/')">Proxy 56</button>
+                <button onclick="openLink('https://my-learning-hall.jemix.sg/')">Proxy 57</button>
+                <button onclick="openLink('https://dididoitright.wiki.gd/')">Proxy 58</button>
+                <button onclick="openLink('https://1932is-when.it.happened.klingler.us/')">Proxy 59</button>
+                <button onclick="openLink('https://s.abl.cl/')">Proxy 60</button>
+                <button onclick="openLink('https://bak2skewl.konpan.ch/')">Proxy 61</button>
+                <button onclick="openLink('https://clown.thegalleryofart.org/')">Proxy 62</button>
+                <button onclick="openLink('https://ynbziad.math-solver.com/')">Proxy 63</button>
+                <button onclick="openLink('https://blood.thegalleryofart.org/')">Proxy 64</button>
+                <button onclick="openLink('https://card.thegalleryofart.org/')">Proxy 65</button>
+                <button onclick="openLink('https://mathematics.internetbowser.com/')">Proxy 66</button>
+                <button onclick="openLink('https://in.multiverse.college/')">Proxy 67</button>
+                <button onclick="openLink('https://interstellar.otil.cl/')">Proxy 68</button>
+                <button onclick="openLink('https://leg-nets.strangled.net/')">Proxy 69</button>
+                <button onclick="openLink('https://linuxblog.root.sx/')">Proxy 70</button>
+                <button onclick="openLink('https://cold.icyinferno.info/')">Proxy 71</button>
+            </div>
+        </div>
+
+        <!-- Rammerhead Proxies -->
+        <div id="rammerhead" class="tab-content">
+            <div class="button-grid">
+                <button onclick="openLink('https://dogloafs.blinklab.com/')">Proxy 1</button>
+                <button onclick="openLink('https://skibidi-rizz-gyatt-fanum-tax-sigma.hamburger.ip-ddns.com/')">Proxy 2</button>
+                <button onclick="openLink('https://nate-is.shogun.ca/')">Proxy 3</button>
+                <button onclick="openLink('https://aw.shit.vc/')">Proxy 4</button>
+                <button onclick="openLink('https://gomkey.meexpress.net/')">Proxy 5</button>
+                <button onclick="openLink('https://ihopeyoulikedogslol.hbmc.net/')">Proxy 6</button>
+                <button onclick="openLink('https://math.hamburger.ip-ddns.com/')">Proxy 7</button>
+                <button onclick="openLink('https://pp.hamburger.ip-ddns.com/')">Proxy 8</button>
+                <button onclick="openLink('https://lyndoniscool.blinklab.com/')">Proxy 9</button>
+                <button onclick="openLink('https://this.is.for.lightspeedpal.ostrovsky.sk/')">Proxy 10</button>
+                <button onclick="openLink('https://thisisforlightspeedbythewayjustsoyouknoweggs.ostrovsky.sk/')">Proxy 11</button>
+                <button onclick="openLink('https://sixseven.h4ck.me/')">Proxy 12</button>
+                <button onclick="openLink('https://joyridejerimiah.far-east-investment.ru/')">Proxy 13</button>
+                <button onclick="openLink('https://h5.wan.360.23xinyou.51.3w2.cc.nc.hzlqun.cn/')">Proxy 14</button>
+                <button onclick="openLink('https://lyndoniscoolforever.blinklab.com/')">Proxy 15</button>
+                <button onclick="openLink('https://isaiahisfriendly.ionexusa.com/')">Proxy 16</button>
+                <button onclick="openLink('https://corbinisverysmart.leondelosrios.com/')">Proxy 17</button>
+                <button onclick="openLink('https://kywantsmyautographonfood.networkoutpost.com/')">Proxy 18</button>
+                <button onclick="openLink('https://baylerisfunny.unids.com/')">Proxy 19</button>
+                <button onclick="openLink('https://coltontreatsmelikecrap.tomasolexa.com/')">Proxy 20</button>
+                <button onclick="openLink('https://rammerhead-himitu.swanndvr.net/')">Proxy 21</button>
+                <button onclick="openLink('https://rammerhead-2.swanndvr.net/')">Proxy 22</button>
+                <button onclick="openLink('https://croze.port82.net/')">Proxy 23</button>
+                <button onclick="openLink('https://test.zecro.de/')">Proxy 24</button>
+                <button onclick="openLink('https://bristol-is-the-king.dorsrv.ru/')">Proxy 25</button>
+                <button onclick="openLink('https://www.classroom.google.com.l5.ca/')">Proxy 26</button>
+                <button onclick="openLink('https://dingdong.pakasak.com/')">Proxy 27</button>
+                <button onclick="openLink('https://our-services.brittainlawfirm.net/')">Proxy 28</button>
+                <button onclick="openLink('https://i.am.the-network-expert.ca/')">Proxy 29</button>
+                <button onclick="openLink('https://silhouette.brandish.rammerhead.nunc.se/')">Proxy 30</button>
+                <button onclick="openLink('https://ohsigma.yesitsreal.nunc.se/')">Proxy 31</button>
+                <button onclick="openLink('https://rammerhead-1.swanndvr.net/')">Proxy 32</button>
+                <button onclick="openLink('https://anarchychessbetterthenregularchess.kmodem.org/')">Proxy 33</button>
+                <button onclick="openLink('https://ram.ens.org/')">Proxy 34</button>
+                <button onclick="openLink('https://unblocker.chesse.ip-ddns.com/')">Proxy 35</button>
+                <button onclick="openLink('https://sigmagoongoonbaby.minecraftnoob.com/')">Proxy 36</button>
+                <button onclick="openLink('https://theman.lingxi-ai.net/')">Proxy 37</button>
+                <button onclick="openLink('https://mrbeastmerch.moldeo.org/')">Proxy 38</button>
+                <button onclick="openLink('https://higuysfr.webs.vc/')">Proxy 39</button>
+                <button onclick="openLink('https://mathprblems.thehomeserver.net/')">Proxy 40</button>
+                <button onclick="openLink('https://labinternet.blinklab.com/')">Proxy 41</button>
+                <button onclick="openLink('https://canva.login.1337.cx/')">Proxy 42</button>
+                <button onclick="openLink('https://daddy-wonka.kalbas.com.vn/')">Proxy 43</button>
+                <button onclick="openLink('https://bighawk.webs.vc/')">Proxy 44</button>
+                <button onclick="openLink('https://bokkinauuu.fpr.net/')">Proxy 45</button>
+                <button onclick="openLink('https://subdomainthingy.l5.ca/')">Proxy 46</button>
+                <button onclick="openLink('https://dennisthemeance.farted.net/')">Proxy 47</button>
+                <button onclick="openLink('https://connorandbenjaminaregay.hatenboer.org/')">Proxy 48</button>
+                <button onclick="openLink('https://connorarebisexual.connorliam.com/')">Proxy 49</button>
+                <button onclick="openLink('https://kofi-was-here-noob.xst.cl/')">Proxy 50</button>
+                <button onclick="openLink('https://mathhomework3.ollemans.com/')">Proxy 51</button>
+                <button onclick="openLink('https://mathhomework4.innovatecchile.com/')">Proxy 52</button>
+                <button onclick="openLink('https://history-of-george-washington.kindy4kids.com.au/')">Proxy 53</button>
+                <button onclick="openLink('https://rammerdaze.miguelarevalo.es/')">Proxy 54</button>
+                <button onclick="openLink('https://banana123.macao.org/')">Proxy 55</button>
+                <button onclick="openLink('https://notaproxy.epicgamer.org/')">Proxy 56</button>
+                <button onclick="openLink('https://ilovemathsomuch.chanka.com/')">Proxy 57</button>
+                <button onclick="openLink('https://ihatemathsomuch.chanka.com/')">Proxy 58</button>
+                <button onclick="openLink('https://englishworksheet.chanka.com/')">Proxy 59</button>
+                <button onclick="openLink('https://crxneedstodotheirwork.chanka.com/')">Proxy 60</button>
+                <button onclick="openLink('https://naninisiyoukamayottyau.allez.la/')">Proxy 61</button>
+                <button onclick="openLink('https://addition.chillyparrotmath.cloudns.ch/')">Proxy 62</button>
+                <button onclick="openLink('https://truckdriving.truckstore.ch/')">Proxy 63</button>
+                <button onclick="openLink('https://mathhomework.rat.si/')">Proxy 64</button>
+                <button onclick="openLink('https://falcs.photo-frame.com/')">Proxy 65</button>
+                <button onclick="openLink('https://creed.sino.tw/')">Proxy 66</button>
+                <button onclick="openLink('https://rileythetopg.vr.lt/')">Proxy 67</button>
+                <button onclick="openLink('https://crazygamers737.idigo.org/')">Proxy 68</button>
+                <button onclick="openLink('https://freerammerhead1.epicgamer.org/')">Proxy 69</button>
+                <button onclick="openLink('https://mathlover.safira.com.my/')">Proxy 70</button>
+                <button onclick="openLink('https://thisforcinco.larrondoinstalaciones.cl/')">Proxy 71</button>
+                <button onclick="openLink('https://bob.bob.omallysplayland.com/')">Proxy 72</button>
+                <button onclick="openLink('https://khanacademy.blinklab.com/')">Proxy 73</button>
+                <button onclick="openLink('https://schoolfunwork.blinklab.com/')">Proxy 74</button>
+                <button onclick="openLink('https://education-lesson-pre-algebra-lesson68.eduarmor.com/')">Proxy 75</button>
+                <button onclick="openLink('https://kennyvoyles.237775.xyz/')">Proxy 76</button>
+                <button onclick="openLink('https://narp.fr.to.joe.dj/')">Proxy 77</button>
+                <button onclick="openLink('https://namenims.fr.to.2fine.de/')">Proxy 78</button>
+                <button onclick="openLink('https://bokkki.oops.wtf/')">Proxy 79</button>
+                <button onclick="openLink('https://sakura-site-rammerhead.ax1951.com/')">Proxy 80</button>
+                <button onclick="openLink('https://waermoster.sistemasplenario.ar/')">Proxy 81</button>
+                <button onclick="openLink('https://mathew-hill.net4ria.com/')">Proxy 82</button>
+                <button onclick="openLink('https://thankchristianifthisworks.guojinloong.cn/')">Proxy 83</button>
+                <button onclick="openLink('https://classroom.haoqiw.com/')">Proxy 84</button>
+                <button onclick="openLink('https://educational-site.24x7.hk/')">Proxy 85</button>
+                <button onclick="openLink('https://bigpoppa.epicgamer.org/')">Proxy 86</button>
+                <button onclick="openLink('https://screwedupclick.ufodns.com/')">Proxy 87</button>
+                <button onclick="openLink('https://lanschool.leno.vopros.kz/')">Proxy 88</button>
+                <button onclick="openLink('https://kyrgyzstan-travel.home.kg/')">Proxy 89</button>
+                <button onclick="openLink('https://tenhh.farted.net/')">Proxy 90</button>
+                <button onclick="openLink('https://willitwork.utrealestatedreamteam.com/')">Proxy 91</button>
+                <button onclick="openLink('https://mexico-skibidi.el-skibito.click/')">Proxy 92</button>
+                <button onclick="openLink('https://kittiescats.awiki.org/')">Proxy 93</button>
+                <button onclick="openLink('https://ripnottiosama.oops.wtf/')">Proxy 94</button>
+                <button onclick="openLink('https://im-going-to-microwave-sonic-iaaaaaaaaaaaaaa.microvivero.cl/')">Proxy 95</button>
+                <button onclick="openLink('https://rammerhead2121.webs.vc/')">Proxy 96</button>
+                <button onclick="openLink('https://eugene57ililillilllillillill.mathewparkin.com/')">Proxy 97</button>
+                <button onclick="openLink('https://cheifsarebad.zenrelax.ro/')">Proxy 98</button>
+                <button onclick="openLink('https://malachi.is.dumb.physiosagart.de/')">Proxy 99</button>
+            </div>
+        </div>
+
+        <!-- Utopia Proxies -->
+        <div id="utopia" class="tab-content">
+            <div class="button-grid">
+                <button onclick="openLink('https://gov.major.novacorp.com/')">Proxy 1</button>
+                <button onclick="openLink('https://music.math.mypuppycam.net/')">Proxy 2</button>
+                <button onclick="openLink('https://howto.basic.legalguatemala.com/')">Proxy 3</button>
+                <button onclick="openLink('https://study.facts.highdex.org/')">Proxy 4</button>
+                <button onclick="openLink('https://angle.goal.andrewshomelabs.com/')">Proxy 5</button>
+                <button onclick="openLink('https://solve.proof.california-red.com/')">Proxy 6</button>
+                <button onclick="openLink('https://sage.skills.hellasinside.com/')">Proxy 7</button>
+                <button onclick="openLink('https://recap.coach.coinio.com/')">Proxy 8</button>
+                <button onclick="openLink('https://class.proof.studiovk.com/')">Proxy 9</button>
+                <button onclick="openLink('https://vocab.sage.garagepig.com/')">Proxy 10</button>
+                <button onclick="openLink('https://howto.piano.kiptrak.com/')">Proxy 11</button>
+                <button onclick="openLink('https://notes.theory.bluekaffee.com/')">Proxy 12</button>
+                <button onclick="openLink('https://class.craft.alerteqa.com/')">Proxy 13</button>
+                <button onclick="openLink('https://topic.idea.ottosulbmec.com/')">Proxy 14</button>
+                <button onclick="openLink('https://utopia.ideas.amentrix.com/')">Proxy 15</button>
+                <button onclick="openLink('https://excel.graph.ramphex.com/')">Proxy 16</button>
+                <button onclick="openLink('https://train.tech.timelesstheory.com/')">Proxy 17</button>
+                <button onclick="openLink('https://prep.clever.cloudworkonline.com/')">Proxy 18</button>
+                <button onclick="openLink('https://arts.utopia.hirschauer.org/')">Proxy 19</button>
+                <button onclick="openLink('https://sci.brain.musictherapyinscotland.com/')">Proxy 20</button>
+                <button onclick="openLink('https://real.books.bahcekoysutyumurta.com/')">Proxy 21</button>
+                <button onclick="openLink('https://proof.add.markduckworth.com/')">Proxy 22</button>
+                <button onclick="openLink('https://focus.train.ajatar.org/')">Proxy 23</button>
+                <button onclick="openLink('https://guide.proof.the-kaisers.net/')">Proxy 24</button>
+                <button onclick="openLink('https://notes.church.myezlife.com/')">Proxy 25</button>
+                <button onclick="openLink('https://work.excel.albacetediario.com/')">Proxy 26</button>
+                <button onclick="openLink('https://gov.course.katswansey.com/')">Proxy 27</button>
+                <button onclick="openLink('https://data.quiz.hkenca.org/')">Proxy 28</button>
+                <button onclick="openLink('https://edu.focus.decharacter.com/')">Proxy 29</button>
+                <button onclick="openLink('https://music.theory.ivyu.net/')">Proxy 30</button>
+                <button onclick="openLink('https://bio.utopia.saraibeam.com/')">Proxy 31</button>
+                <button onclick="openLink('https://craft.real.blinklab.com/')">Proxy 32</button>
+                <button onclick="openLink('https://state.world.baystreetmanagement.com/')">Proxy 33</button>
+                <button onclick="openLink('https://area.world.cervezamolay.com/')">Proxy 34</button>
+                <button onclick="openLink('https://math.focus.arboli.net/')">Proxy 35</button>
+                <button onclick="openLink('https://tests.info.mushahwar.com/')">Proxy 36</button>
+                <button onclick="openLink('https://terms.skill.asleepingturtle.com/')">Proxy 37</button>
+                <button onclick="openLink('https://paper.guide.4nets.org/')">Proxy 38</button>
+                <button onclick="openLink('https://history.essay.fayknowles.com/')">Proxy 39</button>
+                <button onclick="openLink('https://data.state.wyldbrian.com/')">Proxy 40</button>
+                <button onclick="openLink('https://mind.gov.ping24.com/')">Proxy 41</button>
+                <button onclick="openLink('https://data.math.dyvniy.com/')">Proxy 42</button>
+                <button onclick="openLink('https://class.recap.idiaga.com/')">Proxy 43</button>
+            </div>
+        </div>
+
+        <!-- Space Proxies -->
+        <div id="space" class="tab-content">
+            <div class="button-grid">
+                <button onclick="openLink('https://stats.dietpc.org/')">Proxy 1</button>
+                <button onclick="openLink('https://supernatural.hypernormal.org/')">Proxy 2</button>
+                <button onclick="openLink('https://record.brownfamilypics.com/')">Proxy 3</button>
+                <button onclick="openLink('https://random.strangersduo.com/')">Proxy 4</button>
+                <button onclick="openLink('https://food.uncork.biz/')">Proxy 5</button>
+                <button onclick="openLink('https://power.cryodome.com/')">Proxy 6</button>
+                <button onclick="openLink('https://dev.dietpc.org/')">Proxy 7</button>
+                <button onclick="openLink('https://about.thedesktop.com/')">Proxy 8</button>
+                <button onclick="openLink('https://unusual.hypernormal.org/')">Proxy 9</button>
+                <button onclick="openLink('https://help.thedesktop.com/')">Proxy 10</button>
+                <button onclick="openLink('https://partners.strangersduo.com/')">Proxy 11</button>
+                <button onclick="openLink('https://help.dietpc.org/')">Proxy 12</button>
+                <button onclick="openLink('https://avocadofrommexico.limana.rs/')">Proxy 13</button>
+                <button onclick="openLink('https://homeworkfr.cloudbarfbag.com/')">Proxy 14</button>
+                <button onclick="openLink('https://stealthy.2806777.tw/')">Proxy 15</button>
+                <button onclick="openLink('https://studiolearnmusic.estudioferrer.com/')">Proxy 16</button>
+                <button onclick="openLink('https://kahoot.kts2.com.np/')">Proxy 17</button>
+                <button onclick="openLink('https://sop.jumpconsulting.cl/')">Proxy 18</button>
+                <button onclick="openLink('https://wa.mecanicatecnicar.com.ar/')">Proxy 19</button>
+                <button onclick="openLink('https://real.media-sud.ro/')">Proxy 20</button>
+                <button onclick="openLink('https://cat.giripawan.com.np/')">Proxy 21</button>
+                <button onclick="openLink('https://po.itparadiis.eu/')">Proxy 22</button>
+                <button onclick="openLink('https://ae.leodealmagro.com.ar/')">Proxy 23</button>
+            </div>
+        </div>
+
+        <!-- Doge Proxies -->
+        <div id="doge" class="tab-content">
+            <div class="button-grid">
+                <button onclick="openLink('https://dogev4.us.kg/')">Proxy 1</button>
+                <button onclick="openLink('https://notapr0xy.com/')">Proxy 2</button>
+                <button onclick="openLink('https://amir1.cuza16.ro/')">Proxy 3</button>
+                <button onclick="openLink('https://for-da-boiz.vercel.app/')">Proxy 4</button>
+                <button onclick="openLink('https://qg4qp4-8080.csb.app/app')">Proxy 5</button>
+                <button onclick="openLink('https://hms.1337.cx/')">Proxy 6</button>
+                <button onclick="openLink('https://hms.fr.to/')">Proxy 7</button>
+                <button onclick="openLink('https://hms.nya.pub/')">Proxy 8</button>
+                <button onclick="openLink('https://chickennuggets.surendrapant.com.np/')">Proxy 9</button>
+                <button onclick="openLink('https://unicorn.taiwansemicon.org/')">Proxy 10</button>
+                <button onclick="openLink('https://interstellar-schoolh9ug4h9ngnubguyhg7.badrag.net/')">Proxy 11</button>
+                <button onclick="openLink('https://read.silksky.com/')">Proxy 12</button>
+                <button onclick="openLink('https://universityequality.vercel.app/')">Proxy 13</button>
+                <button onclick="openLink('https://study.raisingpro.com/')">Proxy 14</button>
+                <button onclick="openLink('https://buy.machines.asia/')">Proxy 15</button>
+                <button onclick="openLink('https://edu.niles.xyz/')">Proxy 16</button>
+                <button onclick="openLink('https://portal.niles.xyz/')">Proxy 17</button>
+                <button onclick="openLink('https://use.costarockane.nl/')">Proxy 18</button>
+                <button onclick="openLink('https://study.ripcordengineering.com/')">Proxy 19</button>
+                <button onclick="openLink('https://use.razorlan.info/')">Proxy 20</button>
+                <button onclick="openLink('https://nunc.se/')">Proxy 21</button>
+                <button onclick="openLink('https://ostrovsky.sk/')">Proxy 22</button>
+                <button onclick="openLink('https://s0lar-ecl1pse-visual-digram.vercel.app/')">Proxy 23</button>
+                <button onclick="openLink('https://3d-earthspacelearncom.vercel.app/mobile.html')">Proxy 24</button>
+                <button onclick="openLink('https://mathspot.vercel.app/app')">Proxy 25</button>
+                <button onclick="openLink('https://yahoo.epicgamer.org/')">Proxy 26</button>
+                <button onclick="openLink('https://testingnewsubjects.epicgamer.org/')">Proxy 27</button>
+                <button onclick="openLink('https://japanlol.epicgamer.org/')">Proxy 28</button>
+                <button onclick="openLink('https://chickenbakesale.epicgamer.org/')">Proxy 29</button>
+                <button onclick="openLink('https://dog.vpn.net.br/')">Proxy 30</button>
+                <button onclick="openLink('https://lightspeed-plsdontblockthis.vercel.app/')">Proxy 31</button>
+                <button onclick="openLink('https://newlink.ollemans.com/')">Proxy 32</button>
+                <button onclick="openLink('https://doge.pepso89.lol/')">Proxy 33</button>
+                <button onclick="openLink('https://pepsoschoice.pepso89.lol/')">Proxy 34</button>
+                <button onclick="openLink('https://doge.wydoge.dynv6.net/')">Proxy 35</button>
+                <button onclick="openLink('https://trains.fenac.nl/')">Proxy 36</button>
+                <button onclick="openLink('https://doge.wydoge.dns.navy/')">Proxy 37</button>
+                <button onclick="openLink('https://wydoge.dynv6.net/')">Proxy 38</button>
+                <button onclick="openLink('https://wydoge.dns.navy/')">Proxy 39</button>
+                <button onclick="openLink('https://sigma.elettro-pio.ch/')">Proxy 40</button>
+                <button onclick="openLink('https://brocanyoustopaskingforlinks.oops.wtf/')">Proxy 41</button>
+                <button onclick="openLink('https://homework-b6icxt4qq-nuh-uh-e88c20d3.vercel.app')">Proxy 42</button>
+                <button onclick="openLink('https://homework-seven-sepia.vercel.app')">Proxy 43</button>
+                <button onclick="openLink('https://weezer821.mooo.com')">Proxy 44</button>
+                <button onclick="openLink('https://weezer825.jumpingcrab.com')">Proxy 45</button>
+                <button onclick="openLink('https://weezer824.ignorelist.com')">Proxy 46</button>
+                <button onclick="openLink('https://weezer823.crabdance.com')">Proxy 47</button>
+                <button onclick="openLink('https://weezer822.chickenkiller.com')">Proxy 48</button>
+                <button onclick="openLink('https://speedy.ax1951.com/')">Proxy 49</button>
+                <button onclick="openLink('https://school.com.apps.dj/')">Proxy 50</button>
+                <button onclick="openLink('https://nylme.xyz.strangled.net')">Proxy 51</button>
+                <button onclick="openLink('https://v4-alpha-amber.vercel.app/')">Proxy 52</button>
+                <button onclick="openLink('https://portal.hst-ltd.com/')">Proxy 53</button>
+                <button onclick="openLink('https://house.shirokuriwaki.com/')">Proxy 54</button>
+                <button onclick="openLink('https://portals.radial-pistonmotors.com/')">Proxy 55</button>
+                <button onclick="openLink('https://edu.joaopedroreis.com/')">Proxy 56</button>
+                <button onclick="openLink('https://study.poolspotbg.com/')">Proxy 57</button>
+                <button onclick="openLink('https://rizzohiosigmajasin111.com.soon.it/')">Proxy 58</button>
+            </div>
+        </div>
+
+        <!-- Incognito Proxies -->
+        <div id="incognito" class="tab-content">
+            <div class="button-grid">
+                <button onclick="openLink('https://fun.onlytruelegendscanseethe.pics/')">Proxy 1</button>
+                <button onclick="openLink('https://incog.works/')">Proxy 2</button>
+                <button onclick="openLink('https://mapper.netinfotechnology.com/')">Proxy 3</button>
+                <button onclick="openLink('https://nuclearvp.global.ssl.fastly.net/')">Proxy 4</button>
+                <button onclick="openLink('https://matterhero.org/ultraviolet')">Proxy 5</button>
+                <button onclick="openLink('https://moist.vercel.app/')">Proxy 6</button>
+                <button onclick="openLink('https://incognito-static-version.pages.dev/')">Proxy 7</button>
+                <button onclick="openLink('https://unblocker.netlify.app/')">Proxy 8</button>
+                <button onclick="openLink('http://nirbytesproxy.incognitom.com/')">Proxy 9</button>
+                <button onclick="openLink('http://incognito2025.prodom.com/')">Proxy 10</button>
+            </div>
+        </div>
+
+        <!-- Shadow Proxies -->
+        <div id="shadow" class="tab-content">
+            <div class="button-grid">
+                <button onclick="openLink('https://zxyp.04.open-window.de/')">Proxy 1</button>
+                <button onclick="openLink('https://zxyp.03.digitalforest.my/')">Proxy 2</button>
+                <button onclick="openLink('https://zxyp.02.garmanage.com/')">Proxy 3</button>
+                <button onclick="openLink('https://6922.yugadiluitel.com.np/')">Proxy 4</button>
+            </div>
+        </div>
+
+        <!-- Shuttle Proxies -->
+        <div id="shuttle" class="tab-content">
+            <div class="button-grid">
+                <button onclick="openLink('https://nirbytexershutle.vercel.app/')">Proxy 1</button>
+                <button onclick="openLink('https://beautifullady4.vercel.app/')">Proxy 2</button>
+                <button onclick="openLink('https://kolaei.vercel.app/')">Proxy 3</button>
+                <button onclick="openLink('https://dixtermenixx.vercel.app/')">Proxy 4</button>
+                <button onclick="openLink('https://trixmatri2.vercel.app/')">Proxy 5</button>
+                <button onclick="openLink('https://unitedstar33.vercel.app/')">Proxy 6</button>
+                <button onclick="openLink('https://directunblock.vercel.app/')">Proxy 7</button>
+                <button onclick="openLink('https://trimletxtreme23.vercel.app/')">Proxy 8</button>
+                <button onclick="openLink('https://nefolie23.vercel.app/')">Proxy 9</button>
+                <button onclick="openLink('https://dengalingee.vercel.app/')">Proxy 10</button>
+                <button onclick="openLink('https://nirbytes2025shuttle.vercel.app/')">Proxy 11</button>
+                <button onclick="openLink('https://nirbytesxretpro.vercel.app/')">Proxy 12</button>
+                <button onclick="openLink('https://janu23.vercel.app/')">Proxy 13</button>
+                <button onclick="openLink('https://vipusersxero.vercel.app/')">Proxy 14</button>
+                <button onclick="openLink('https://siaxei3.vercel.app/')">Proxy 15</button>
+                <button onclick="openLink('https://maxr2025.vercel.app/')">Proxy 16</button>
+                <button onclick="openLink('https://mian3i.vercel.app/')">Proxy 17</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openLink(url) {
+            const blankWindow = window.open('about:blank', '_blank');
+            if (blankWindow) {
+                blankWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>Proxy Redirect</title>
+                        <style>
+                            body {
+                                font-family: 'Segoe UI', Arial, sans-serif;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                height: 100vh;
+                                margin: 0;
+                                background: linear-gradient(135deg, #4a00e0, #8e2de2);
+                            }
+                            .container {
+                                text-align: center;
+                                padding: 40px;
+                                background: white;
+                                border-radius: 20px;
+                                box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+                            }
+                            h2 {
+                                color: #4a00e0;
+                                margin-bottom: 20px;
+                            }
+                            p {
+                                color: #2d3436;
+                                margin-bottom: 30px;
+                            }
+                            button {
+                                padding: 12px 30px;
+                                font-size: 16px;
+                                color: white;
+                                background: linear-gradient(45deg, #4a00e0, #8e2de2);
+                                border: none;
+                                border-radius: 25px;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                            }
+                            button:hover {
+                                transform: translateY(-3px);
+                                box-shadow: 0 6px 20px rgba(74, 0, 224, 0.3);
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h2>Proceed to Proxy</h2>
+                            <p>This tab is set to about:blank. Click below to visit the proxy site:</p>
+                            <button onclick="window.location.href='${url}'">Go to Proxy</button>
+                        </div>
+                    </body>
+                    </html>
+                `);
+                blankWindow.document.close();
+            } else {
+                alert('Popup blocked. Please allow popups for this site.');
+            }
+        }
+
+        function openTab(tabName) {
+            const tabs = document.getElementsByClassName('tab-content');
+            const buttons = document.getElementsByClassName('tab-button');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active');
+            }
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+            filterProxies('');
+        }
+
+        function filterProxies(searchTerm) {
+            const activeTab = document.querySelector('.tab-content.active');
+            const buttons = activeTab.querySelectorAll('.button-grid button');
+            buttons.forEach(button => {
+                const url = button.getAttribute('onclick').match(/'(.*?)'/)[1];
+                button.style.display = url.toLowerCase().includes(searchTerm.toLowerCase()) ? 'block' : 'none';
+            });
+        }
+
+        document.getElementById('proxy-search').addEventListener('input', (e) => {
+            filterProxies(e.target.value);
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9198b8dd8a947bb4',t:'MTc0MDgzMjgxOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
